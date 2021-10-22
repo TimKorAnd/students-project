@@ -3,6 +3,7 @@ type Subject = string; // TODO does it need restrictions?
 type InputRecord = [StudentId, Subject];
 type Input = InputRecord[];
 type OutputStudentIds = `${StudentId},${StudentId}`;
+type Output = Record<OutputStudentIds, Subject[]>;
 
 const input: Input = [
   ["1", "Economics"],
@@ -41,18 +42,18 @@ const getAggregateObjectWhereStudentIdMatchesFullSubjectsArray = (uniqueIds: Stu
   }, {} as Record<StudentId, Subject[]>);
 }
 
-const getOutput = (input: Input): Record<OutputStudentIds, Subject[]> => {
+const getOutput = (input: Input): Output => {
 
   const objectStudent = getAggregateObjectWhereStudentIdMatchesFullSubjectsArray(studentUniqueIds, input);
 
-  return studentUniqueIds.reduce((output: Record<OutputStudentIds, Subject[]>, idA: StudentId, index: number, ids: StudentId[]) => {
+  return studentUniqueIds.reduce((output: Output, idA: StudentId, index: number, ids: StudentId[]) => {
     const restIds: StudentId[] = ids.slice(index + 1);
-    restIds.reduce((output: Record<OutputStudentIds, Subject[]>, idB: StudentId) => {
+    restIds.reduce((output: Output, idB: StudentId) => {
       output[`${idA},${idB}`] = getIntersectionOfTwoArrays(objectStudent[idA], objectStudent[idB]);
       return output;
-    }, output as Record<OutputStudentIds, Subject[]>);
+    }, output as Output);
     return output;
-  }, {} as Record<OutputStudentIds, Subject[]>)
+  }, {} as Output)
 }
 
 console.log(getOutput(input));
